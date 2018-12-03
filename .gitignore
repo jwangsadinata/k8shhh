@@ -1,0 +1,7 @@
+.env
+*.log
+
+/k8shhh
+/k8shhh.exe
+/cmd/k8shhh/k8shhh
+/cmd/k8shhh/k8shhh.exe
