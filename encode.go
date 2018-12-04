@@ -10,15 +10,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// JsonTemplate is the template struct for json encoding
-type JsonTemplate struct {
-	ApiVersion string            `json:"apiVersion"`
-	Data       map[string]string `json:"data"`
-	Kind       string            `json:"kind"`
-	Metadata   map[string]string `json:"metadata"`
-	Type       string            `json:"type"`
-}
-
 // Secret is the type containing the name and the underlying data
 type Secret struct {
 	Name string
@@ -28,7 +19,17 @@ type Secret struct {
 // Encoder is a type for function that encodes the given Secret
 type Encoder func(Secret) ([]byte, error)
 
+// jsonTemplate is the template struct for json encoding
+type jsonTemplate struct {
+	ApiVersion string            `json:"apiVersion"`
+	Data       map[string]string `json:"data"`
+	Kind       string            `json:"kind"`
+	Metadata   map[string]string `json:"metadata"`
+	Type       string            `json:"type"`
+}
+
 const (
+	// yamlTemplate is the template string for yaml encoding
 	yamlTemplate = `apiVersion: v1
 kind: Secret
 metadata:
@@ -41,7 +42,6 @@ data:
 
 // Encode encodes the input based on the given encoder
 func Encode(input io.Reader, encoder Encoder, name string) ([]byte, error) {
-	// parse the input
 	data, err := godotenv.Parse(input)
 	if err != nil {
 		return nil, err
@@ -52,8 +52,7 @@ func Encode(input io.Reader, encoder Encoder, name string) ([]byte, error) {
 
 // EncodeJson encodes the secret and output it to a json format
 func EncodeJson(secret Secret) ([]byte, error) {
-	// initialize the template struct
-	tmpl := JsonTemplate{
+	tmpl := jsonTemplate{
 		ApiVersion: "v1",
 		Kind:       "Secret",
 		Type:       "Opaque",
@@ -61,10 +60,8 @@ func EncodeJson(secret Secret) ([]byte, error) {
 		Metadata:   make(map[string]string),
 	}
 
-	// initialize the metadata
 	tmpl.Metadata["name"] = secret.Name
 
-	// encode the data
 	for k, v := range secret.Data {
 		tmpl.Data[k] = base64.StdEncoding.EncodeToString([]byte(v))
 	}
@@ -74,7 +71,6 @@ func EncodeJson(secret Secret) ([]byte, error) {
 
 // EncodeYaml encodes the secret and output it to a yaml format
 func EncodeYaml(secret Secret) ([]byte, error) {
-	// initialize the template and encode function
 	t, err := template.New("k8s-secrets").Funcs(template.FuncMap{
 		"encode": func(input string) string {
 			return base64.StdEncoding.EncodeToString([]byte(input))
@@ -83,7 +79,6 @@ func EncodeYaml(secret Secret) ([]byte, error) {
 		return nil, err
 	}
 
-	// run the data against the template
 	buf := new(bytes.Buffer)
 	err = t.Execute(buf, secret)
 	if err != nil {

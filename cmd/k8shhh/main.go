@@ -28,10 +28,8 @@ var (
 
 // run initializes the command line parser
 func run() int {
-	// set the version
 	kingpin.Version(VERSION)
 
-	// parse the context for the application
 	ctx, err := app.ParseContext(os.Args[1:])
 	if err != nil {
 		return 1
@@ -39,21 +37,18 @@ func run() int {
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case enc.FullCommand():
-		// validate encoding input
 		if isInteractive() && *encInput == "" {
 			kingpin.CommandLine.UsageForContext(ctx)
 			fmt.Fprintln(os.Stderr, "expecting input on stdin")
 			return 1
 		}
 
-		// validate encoding format
 		if *encFormat != "json" && *encFormat != "yaml" {
 			kingpin.CommandLine.UsageForContext(ctx)
 			fmt.Fprintln(os.Stderr, "format must be either yaml or json")
 			return 1
 		}
 
-		// setup the encoding input
 		var input io.Reader
 		input = os.Stdin
 		if *encInput != "" {
@@ -66,7 +61,6 @@ func run() int {
 			input = f
 		}
 
-		// parse the encoder
 		var encoder Encoder
 		switch *encFormat {
 		case "json":
@@ -75,28 +69,24 @@ func run() int {
 			encoder = EncodeYaml
 		}
 
-		// encode the secret file
 		if output, err := Encode(input, encoder, *encSecretName); err != nil {
 			fmt.Fprintf(os.Stderr, "error in encoding: %v\n", err)
 			return 1
 		} else {
 			if *encOutput != "" {
-				// write to file with the appropriate permissions
 				err := ioutil.WriteFile(*encOutput, output, 0644)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
 					return 1
 				}
 
-				// print the file name out - useful for kubectl create secrets
+				// print the file name out - useful for pipe with `kubectl create -f`
 				fmt.Print(*encOutput)
 			} else {
-				// print the output to stdout
 				fmt.Print(string(output))
 			}
 		}
 	case version.FullCommand():
-		// print out the version
 		fmt.Printf("k8shhh %s\n", VERSION)
 	}
 
