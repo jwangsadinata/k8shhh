@@ -16,6 +16,7 @@ func initializeDataMap() {
 
 // TestEncode tests the Encode function
 func TestEncode(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input   io.Reader
 		encoder Encoder
@@ -56,25 +57,28 @@ func TestEncode(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		res, err := Encode(test.input, test.encoder, test.name)
-		if err == nil {
-			if test.err != nil {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			res, err := Encode(test.input, test.encoder, test.name)
+			if err == nil {
+				if test.err != nil {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
+			} else {
+				if err.Error() != test.err.Error() {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
 			}
-			continue
-		} else {
-			if err.Error() != test.err.Error() {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			if string(res) != test.res {
+				t.Fatalf("expected response to be %q but got %q", test.res, res)
 			}
-		}
-		if string(res) != test.res {
-			t.Fatalf("expected response to be %q but got %q", test.res, res)
-		}
+		})
 	}
 }
 
 // TestEncodeJson tests the EncodeJson function
 func TestEncodeJson(t *testing.T) {
+	t.Parallel()
 	initializeDataMap()
 	tests := []struct {
 		secret Secret
@@ -92,25 +96,28 @@ func TestEncodeJson(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		res, err := EncodeJson(test.secret)
-		if err == nil {
-			if test.err != nil {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+		test := test
+		t.Run(test.secret.Name, func(t *testing.T) {
+			res, err := EncodeJson(test.secret)
+			if err == nil {
+				if test.err != nil {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
+			} else {
+				if err.Error() != test.err.Error() {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
 			}
-			continue
-		} else {
-			if err.Error() != test.err.Error() {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			if string(res) != test.res {
+				t.Fatalf("expected response to be %q but got %q", test.res, res)
 			}
-		}
-		if string(res) != test.res {
-			t.Fatalf("expected response to be %q but got %q", test.res, res)
-		}
+		})
 	}
 }
 
 // TestEncodeYaml tests the EncodeYaml function
 func TestEncodeYaml(t *testing.T) {
+	t.Parallel()
 	initializeDataMap()
 	tests := []struct {
 		secret Secret
@@ -128,20 +135,22 @@ func TestEncodeYaml(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		res, err := EncodeYaml(test.secret)
-		if err == nil {
-			if test.err != nil {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+		test := test
+		t.Run(test.secret.Name, func(t *testing.T) {
+			res, err := EncodeYaml(test.secret)
+			if err == nil {
+				if test.err != nil {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
+			} else {
+				if err.Error() != test.err.Error() {
+					t.Fatalf("expected error to be %q but got %q", test.err, err)
+				}
 			}
-			continue
-		} else {
-			if err.Error() != test.err.Error() {
-				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			if string(res) != test.res {
+				t.Fatalf("expected response to be %q but got %q", test.res, res)
 			}
-		}
-		if string(res) != test.res {
-			t.Fatalf("expected response to be %q but got %q", test.res, res)
-		}
+		})
 	}
 }
 
