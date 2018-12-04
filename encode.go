@@ -76,13 +76,13 @@ func EncodeYaml(secret Secret) ([]byte, error) {
 			return base64.StdEncoding.EncodeToString([]byte(input))
 		}}).Parse(yamlTemplate)
 	if err != nil {
-		return nil, err
+		return []byte{}, err
 	}
 
 	buf := new(bytes.Buffer)
 	err = t.Execute(buf, secret)
 	if err != nil {
-		return nil, err
+		return []byte{}, err
 	}
 
 	return buf.Bytes(), nil
