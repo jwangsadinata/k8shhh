@@ -1,6 +1,7 @@
 package k8shhh
 
 import (
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -23,39 +24,48 @@ func TestEncode(t *testing.T) {
 		err     error
 	}{
 		{
+			input:   strings.NewReader("-1"),
+			encoder: EncodeYaml,
+			name:    "error-test",
+			err:     errors.New("Can't separate key from value"),
+		},
+		{
 			input:   strings.NewReader(""),
 			encoder: EncodeJson,
 			name:    "json-empty",
 			res:     successJsonTestEmpty,
-			err:     nil,
 		},
 		{
 			input:   strings.NewReader(""),
 			encoder: EncodeYaml,
 			name:    "yaml-empty",
 			res:     successYamlTestEmpty,
-			err:     nil,
 		},
 		{
 			input:   strings.NewReader("a=b"),
 			encoder: EncodeJson,
 			name:    "json-one",
 			res:     successJsonTestOne,
-			err:     nil,
 		},
 		{
 			input:   strings.NewReader("a=b"),
 			encoder: EncodeYaml,
 			name:    "yaml-one",
 			res:     successYamlTestOne,
-			err:     nil,
 		},
 	}
 
 	for _, test := range tests {
 		res, err := Encode(test.input, test.encoder, test.name)
-		if err != test.err {
-			t.Fatalf("expected error to be %q but got %q", test.err, err)
+		if err == nil {
+			if test.err != nil {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
+			continue
+		} else {
+			if err.Error() != test.err.Error() {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
 		}
 		if string(res) != test.res {
 			t.Fatalf("expected response to be %q but got %q", test.res, res)
@@ -74,19 +84,24 @@ func TestEncodeJson(t *testing.T) {
 		{
 			secret: Secret{"json-empty", make(map[string]string)},
 			res:    successJsonTestEmpty,
-			err:    nil,
 		},
 		{
 			secret: Secret{"json-one", dataMap},
 			res:    successJsonTestOne,
-			err:    nil,
 		},
 	}
 
 	for _, test := range tests {
 		res, err := EncodeJson(test.secret)
-		if err != test.err {
-			t.Fatalf("expected error to be %q but got %q", test.err, err)
+		if err == nil {
+			if test.err != nil {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
+			continue
+		} else {
+			if err.Error() != test.err.Error() {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
 		}
 		if string(res) != test.res {
 			t.Fatalf("expected response to be %q but got %q", test.res, res)
@@ -105,19 +120,24 @@ func TestEncodeYaml(t *testing.T) {
 		{
 			secret: Secret{"yaml-empty", make(map[string]string)},
 			res:    successYamlTestEmpty,
-			err:    nil,
 		},
 		{
 			secret: Secret{"yaml-one", dataMap},
 			res:    successYamlTestOne,
-			err:    nil,
 		},
 	}
 
 	for _, test := range tests {
 		res, err := EncodeYaml(test.secret)
-		if err != test.err {
-			t.Fatalf("expected error to be %q but got %q", test.err, err)
+		if err == nil {
+			if test.err != nil {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
+			continue
+		} else {
+			if err.Error() != test.err.Error() {
+				t.Fatalf("expected error to be %q but got %q", test.err, err)
+			}
 		}
 		if string(res) != test.res {
 			t.Fatalf("expected response to be %q but got %q", test.res, res)
