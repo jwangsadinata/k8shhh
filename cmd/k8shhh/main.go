@@ -19,7 +19,7 @@ var (
 
 	enc           = app.Command("encode", "encode your configuration as k8s secrets")
 	encSecretName = enc.Flag("name", "the name of the generated secret").Default("mysecret").Short('n').String()
-	encInput      = enc.Flag("input", "the name of the input file to encode (if input is not provided via STDIN").Short('i').String()
+	encInput      = enc.Flag("input", "the name of the input file to encode (if input is not provided via STDIN)").Short('i').String()
 	encOutput     = enc.Flag("output", "the name of the file to write the output to (outputs to STDOUT by default)").Short('o').String()
 	encFormat     = enc.Flag("format", "format of the generated secret (json or yaml, defaults to yaml)").Default("yaml").Short('f').String()
 
