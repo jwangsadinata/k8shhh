@@ -67,24 +67,24 @@ func TestEncode(t *testing.T) {
 func TestEncodeJson(t *testing.T) {
 	initializeDataMap()
 	tests := []struct {
-		secrets Secrets
-		res     string
-		err     error
+		secret Secret
+		res    string
+		err    error
 	}{
 		{
-			secrets: Secrets{"json-empty", make(map[string]string)},
-			res:     successJsonTestEmpty,
-			err:     nil,
+			secret: Secret{"json-empty", make(map[string]string)},
+			res:    successJsonTestEmpty,
+			err:    nil,
 		},
 		{
-			secrets: Secrets{"json-one", dataMap},
-			res:     successJsonTestOne,
-			err:     nil,
+			secret: Secret{"json-one", dataMap},
+			res:    successJsonTestOne,
+			err:    nil,
 		},
 	}
 
 	for _, test := range tests {
-		res, err := EncodeJson(test.secrets)
+		res, err := EncodeJson(test.secret)
 		if err != test.err {
 			t.Fatalf("expected error to be %q but got %q", test.err, err)
 		}
@@ -98,24 +98,24 @@ func TestEncodeJson(t *testing.T) {
 func TestEncodeYaml(t *testing.T) {
 	initializeDataMap()
 	tests := []struct {
-		secrets Secrets
-		res     string
-		err     error
+		secret Secret
+		res    string
+		err    error
 	}{
 		{
-			secrets: Secrets{"yaml-empty", make(map[string]string)},
-			res:     successYamlTestEmpty,
-			err:     nil,
+			secret: Secret{"yaml-empty", make(map[string]string)},
+			res:    successYamlTestEmpty,
+			err:    nil,
 		},
 		{
-			secrets: Secrets{"yaml-one", dataMap},
-			res:     successYamlTestOne,
-			err:     nil,
+			secret: Secret{"yaml-one", dataMap},
+			res:    successYamlTestOne,
+			err:    nil,
 		},
 	}
 
 	for _, test := range tests {
-		res, err := EncodeYaml(test.secrets)
+		res, err := EncodeYaml(test.secret)
 		if err != test.err {
 			t.Fatalf("expected error to be %q but got %q", test.err, err)
 		}

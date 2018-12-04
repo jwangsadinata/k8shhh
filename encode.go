@@ -19,14 +19,14 @@ type JsonTemplate struct {
 	Type       string            `json:"type"`
 }
 
-// Secrets is the struct containing the name and data
-type Secrets struct {
+// Secret is the type containing the name and the underlying data
+type Secret struct {
 	Name string
 	Data map[string]string
 }
 
-// Encoder is a type for function that encodes secrets
-type Encoder func(Secrets) ([]byte, error)
+// Encoder is a type for function that encodes the given Secret
+type Encoder func(Secret) ([]byte, error)
 
 const (
 	yamlTemplate = `apiVersion: v1
@@ -47,11 +47,11 @@ func Encode(input io.Reader, encoder Encoder, name string) ([]byte, error) {
 		return nil, err
 	}
 
-	return encoder(Secrets{name, data})
+	return encoder(Secret{name, data})
 }
 
 // EncodeJson encodes the secret and output it to a json format
-func EncodeJson(secrets Secrets) ([]byte, error) {
+func EncodeJson(secret Secret) ([]byte, error) {
 	// initialize the template struct
 	tmpl := JsonTemplate{
 		ApiVersion: "v1",
@@ -62,10 +62,10 @@ func EncodeJson(secrets Secrets) ([]byte, error) {
 	}
 
 	// initialize the metadata
-	tmpl.Metadata["name"] = secrets.Name
+	tmpl.Metadata["name"] = secret.Name
 
 	// encode the data
-	for k, v := range secrets.Data {
+	for k, v := range secret.Data {
 		tmpl.Data[k] = base64.StdEncoding.EncodeToString([]byte(v))
 	}
 
@@ -73,7 +73,7 @@ func EncodeJson(secrets Secrets) ([]byte, error) {
 }
 
 // EncodeYaml encodes the secret and output it to a yaml format
-func EncodeYaml(secrets Secrets) ([]byte, error) {
+func EncodeYaml(secret Secret) ([]byte, error) {
 	// initialize the template and encode function
 	t, err := template.New("k8s-secrets").Funcs(template.FuncMap{
 		"encode": func(input string) string {
@@ -85,7 +85,7 @@ func EncodeYaml(secrets Secrets) ([]byte, error) {
 
 	// run the data against the template
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, secrets)
+	err = t.Execute(buf, secret)
 	if err != nil {
 		return nil, err
 	}
