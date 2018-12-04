@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	. "github.com/jwangsadinata/k8shhh"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -22,6 +23,10 @@ var (
 	encInput      = enc.Flag("input", "the name of the input file to encode (if input is not provided via STDIN)").Short('i').String()
 	encOutput     = enc.Flag("output", "the name of the file to write the output to (outputs to STDOUT by default)").Short('o').String()
 	encFormat     = enc.Flag("format", "format of the generated secret (json or yaml, defaults to yaml)").Default("yaml").Short('f').String()
+
+	dec       = app.Command("decode", "decode your k8s secrets into a readable format")
+	decInput  = dec.Flag("input", "the name of the input file to decode (if input is not provided via STDIN)").Short('i').String()
+	decOutput = dec.Flag("output", "the name of the file to write the output to (outputs to STDOUT by default)").Short('o').String()
 
 	version = app.Command("version", "print the current version of k8shhh.")
 )
@@ -82,6 +87,48 @@ func run() int {
 
 				// print the file name out - useful for pipe with `kubectl create -f`
 				fmt.Print(*encOutput)
+			} else {
+				fmt.Print(string(output))
+			}
+		}
+	case dec.FullCommand():
+		if isInteractive() && *decInput == "" {
+			kingpin.CommandLine.UsageForContext(ctx)
+			fmt.Fprintln(os.Stderr, "expecting input on stdin")
+			return 1
+		}
+
+		var input io.Reader
+		input = os.Stdin
+		if *decInput != "" {
+			f, err := os.Open(*decInput)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "reading input file: %s", err)
+				return 1
+			}
+			defer f.Close()
+			input = f
+		}
+
+		var decoder Decoder
+		if *decInput != "" && strings.Contains(*decInput, ".json") {
+			decoder = DecodeJson
+		} else {
+			decoder = DecodeYaml
+		}
+
+		if output, err := Decode(input, decoder); err != nil {
+			fmt.Fprintf(os.Stderr, "error in decoding: %v\n", err)
+			return 1
+		} else {
+			if *decOutput != "" {
+				err := ioutil.WriteFile(*decOutput, output, 0644)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
+					return 1
+				}
+
+				fmt.Printf("file %s created", *decOutput)
 			} else {
 				fmt.Print(string(output))
 			}
