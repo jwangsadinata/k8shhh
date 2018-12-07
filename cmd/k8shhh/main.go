@@ -19,9 +19,9 @@ var (
 	app = kingpin.New("k8shhh", "k8shhh: Quickly encode your configuration into K8s secrets.")
 
 	enc           = app.Command("encode", "encode your configuration as k8s secrets")
-	encSecretName = enc.Flag("name", "the name of the generated secret").Default("mysecret").Short('n').String()
+	encSecretName = enc.Flag("name", "the name of the generated secret").Short('n').String()
 	encInput      = enc.Flag("input", "the name of the input file to encode (if input is not provided via STDIN)").Short('i').String()
-	encOutput     = enc.Flag("output", "the name of the file to write the output to (outputs to STDOUT by default)").Short('o').String()
+	encOutput     = enc.Flag("output", "the name of the file to write the output to (outputs to STDOUT by default). file extension will be automatically generated based on the format.").Short('o').String()
 	encFormat     = enc.Flag("format", "format of the generated secret (json or yaml, defaults to yaml)").Default("yaml").Short('f').String()
 
 	dec       = app.Command("decode", "decode your k8s secrets into a readable format")
@@ -74,19 +74,34 @@ func run() int {
 			encoder = EncodeYaml
 		}
 
-		if output, err := Encode(input, encoder, *encSecretName); err != nil {
+		var secretName string
+		if *encSecretName == "" {
+			if *encOutput == "" {
+				secretName = "mysecret"
+			} else {
+				secretName = trimExtension(*encOutput)
+			}
+		} else {
+			secretName = *encSecretName
+		}
+
+		if output, err := Encode(input, encoder, secretName); err != nil {
 			fmt.Fprintf(os.Stderr, "error in encoding: %v\n", err)
 			return 1
 		} else {
 			if *encOutput != "" {
-				err := ioutil.WriteFile(*encOutput, output, 0644)
+				filename := *encOutput
+				if !checkExtension(*encOutput) {
+					filename = fmt.Sprintf("%s.%s", *encOutput, *encFormat)
+				}
+				err := ioutil.WriteFile(filename, output, 0644)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
 					return 1
 				}
 
 				// print the file name out - useful for pipe with `kubectl create -f`
-				fmt.Print(*encOutput)
+				fmt.Print(filename)
 			} else {
 				fmt.Print(string(output))
 			}
@@ -138,6 +153,21 @@ func run() int {
 	}
 
 	return 0
+}
+
+// checkExtension checks whether the output string contains a .json or .yaml
+// extension
+func checkExtension(output string) bool {
+	return strings.HasSuffix(output, ".yaml") || strings.HasSuffix(output, ".json")
+}
+
+// trimExtension trims the output string if it contains a .json or .yaml
+// extension
+func trimExtension(output string) string {
+	if checkExtension(output) {
+		return output[:len(output)-5]
+	}
+	return output
 }
 
 // isInteractive returns true if os.Stdin appears to be interactive
