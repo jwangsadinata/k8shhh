@@ -201,11 +201,20 @@ $ cat example.json
 for kubernetes. Some of the examples include the following:
 
 ```bash
-$ kubectl create -f $(echo "TOKEN=8fd41973acac04e5fc76fde5439c8b94f1eb1233" | k8shhh encode -o version)
-secret "version" created
+$ kubectl create -f $(echo "TOKEN=8fd41973acac04e5fc76fde5439c8b94f1eb1233" | k8shhh encode -o token)
+secret "token" created
 
-$ kubectl describe secrets/version
-// TODO-jason
+$ kubectl describe secrets/token
+Name:         token
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
+
+Type:  Opaque
+
+Data
+====
+TOKEN:  40 bytes
 ```
 
 The most common use case will be to encode directly from a relatively long `.env` file, and pass it as kubernetes secrets, as follows:
@@ -254,7 +263,49 @@ $ kubectl create -f $(k8shhh encode -i .env -o gitlab)
 secret "gitlab" created
 
 $ kubectl describe secrets/gitlab
-// TODO-jason
+Name:         gitlab
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
+
+Type:  Opaque
+
+Data
+====
+GITLAB_USER_EMAIL:        16 bytes
+CI_SERVER_VERSION_MINOR:  1 bytes
+CI_PROJECT_ID:            2 bytes
+CI_REGISTRY:              20 bytes
+CI_JOB_STAGE:             4 bytes
+CI_PROJECT_PATH:          20 bytes
+CI_PROJECT_URL:           40 bytes
+CI_REPOSITORY_URL:        81 bytes
+CI_COMMIT_REF_NAME:       6 bytes
+CI_COMMIT_SHA:            40 bytes
+CI_JOB_TRIGGERED:         4 bytes
+CI_PIPELINE_IID:          2 bytes
+CI_PROJECT_DIR:           28 bytes
+CI_PROJECT_NAME:          9 bytes
+CI_RUNNER_DESCRIPTION:    9 bytes
+CI_SERVER:                3 bytes
+CI_JOB_ID:                2 bytes
+CI_JOB_TOKEN:             20 bytes
+CI_SERVER_VERSION_MAJOR:  1 bytes
+GITLAB_USER_ID:           2 bytes
+CI_PIPELINE_ID:           4 bytes
+CI_PROJECT_NAMESPACE:     10 bytes
+CI_JOB_NAME:              10 bytes
+CI_REGISTRY_PASSWORD:     17 bytes
+CI_SERVER_REVISION:       7 bytes
+CI_SERVER_VERSION:        5 bytes
+CI_COMMIT_TAG:            5 bytes
+CI_JOB_MANUAL:            4 bytes
+CI_SERVER_VERSION_PATCH:  1 bytes
+CI_RUNNER_TAGS:           13 bytes
+CI_SERVER_NAME:           6 bytes
+CI_RUNNER_ID:             2 bytes
+CI_REGISTRY_IMAGE:        41 bytes
+CI_REGISTRY_USER:         15 bytes
 ```
 
 #### Decode from standard input
