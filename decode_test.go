@@ -55,6 +55,12 @@ func TestDecode(t *testing.T) {
 			res:     "",
 		},
 		{
+			input:   strings.NewReader(successDecodeYamlTestEmpty2),
+			decoder: DecodeYaml,
+			name:    "yaml-empty2",
+			res:     "",
+		},
+		{
 			input:   strings.NewReader(successDecodeJsonTestOne),
 			decoder: DecodeJson,
 			name:    "json-one",
@@ -208,6 +214,14 @@ metadata:
   name: yaml-empty
 type: Opaque
 data:
+`
+
+	successDecodeYamlTestEmpty2 = `apiVersion: v1
+kind: Secret
+metadata:
+  name: yaml-empty2
+type: Opaque
+data: {}
 `
 
 	successDecodeYamlTestOne = `apiVersion: v1
