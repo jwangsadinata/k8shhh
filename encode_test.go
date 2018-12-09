@@ -7,13 +7,6 @@ import (
 	"testing"
 )
 
-var dataMap = make(map[string]string)
-
-// initializeDataMap initializes the data map
-func initializeDataMap() {
-	dataMap["a"] = "b"
-}
-
 // TestEncode tests the Encode function
 func TestEncode(t *testing.T) {
 	t.Parallel()
@@ -34,25 +27,25 @@ func TestEncode(t *testing.T) {
 			input:   strings.NewReader(""),
 			encoder: EncodeJson,
 			name:    "json-empty",
-			res:     successJsonTestEmpty,
+			res:     successEncodeJsonTestEmpty,
 		},
 		{
 			input:   strings.NewReader(""),
 			encoder: EncodeYaml,
 			name:    "yaml-empty",
-			res:     successYamlTestEmpty,
+			res:     successEncodeYamlTestEmpty,
 		},
 		{
 			input:   strings.NewReader("a=b"),
 			encoder: EncodeJson,
 			name:    "json-one",
-			res:     successJsonTestOne,
+			res:     successEncodeJsonTestOne,
 		},
 		{
 			input:   strings.NewReader("a=b"),
 			encoder: EncodeYaml,
 			name:    "yaml-one",
-			res:     successYamlTestOne,
+			res:     successEncodeYamlTestOne,
 		},
 	}
 
@@ -79,7 +72,6 @@ func TestEncode(t *testing.T) {
 // TestEncodeJson tests the EncodeJson function
 func TestEncodeJson(t *testing.T) {
 	t.Parallel()
-	initializeDataMap()
 	tests := []struct {
 		secret Secret
 		res    string
@@ -87,11 +79,11 @@ func TestEncodeJson(t *testing.T) {
 	}{
 		{
 			secret: Secret{"json-empty", make(map[string]string)},
-			res:    successJsonTestEmpty,
+			res:    successEncodeJsonTestEmpty,
 		},
 		{
-			secret: Secret{"json-one", dataMap},
-			res:    successJsonTestOne,
+			secret: Secret{"json-one", map[string]string{"a": "b"}},
+			res:    successEncodeJsonTestOne,
 		},
 	}
 
@@ -118,7 +110,6 @@ func TestEncodeJson(t *testing.T) {
 // TestEncodeYaml tests the EncodeYaml function
 func TestEncodeYaml(t *testing.T) {
 	t.Parallel()
-	initializeDataMap()
 	tests := []struct {
 		secret Secret
 		res    string
@@ -126,11 +117,11 @@ func TestEncodeYaml(t *testing.T) {
 	}{
 		{
 			secret: Secret{"yaml-empty", make(map[string]string)},
-			res:    successYamlTestEmpty,
+			res:    successEncodeYamlTestEmpty,
 		},
 		{
-			secret: Secret{"yaml-one", dataMap},
-			res:    successYamlTestOne,
+			secret: Secret{"yaml-one", map[string]string{"a": "b"}},
+			res:    successEncodeYamlTestOne,
 		},
 	}
 
@@ -155,7 +146,7 @@ func TestEncodeYaml(t *testing.T) {
 }
 
 const (
-	successJsonTestEmpty = `{
+	successEncodeJsonTestEmpty = `{
 	"apiVersion": "v1",
 	"data": {},
 	"kind": "Secret",
@@ -165,7 +156,7 @@ const (
 	"type": "Opaque"
 }`
 
-	successJsonTestOne = `{
+	successEncodeJsonTestOne = `{
 	"apiVersion": "v1",
 	"data": {
 		"a": "Yg=="
@@ -177,20 +168,20 @@ const (
 	"type": "Opaque"
 }`
 
-	successYamlTestEmpty = `apiVersion: v1
+	successEncodeYamlTestEmpty = `apiVersion: v1
+data: {}
 kind: Secret
 metadata:
   name: yaml-empty
 type: Opaque
-data:
 `
 
-	successYamlTestOne = `apiVersion: v1
+	successEncodeYamlTestOne = `apiVersion: v1
+data:
+  a: Yg==
 kind: Secret
 metadata:
   name: yaml-one
 type: Opaque
-data:
-  a: Yg==
 `
 )
