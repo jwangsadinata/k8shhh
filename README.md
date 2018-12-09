@@ -49,12 +49,12 @@ version | print the current version of k8shhh
 ```bash
 $ echo "ETCD_NAME=kube-etcd" | k8shhh encode
 apiVersion: v1
+data:
+  ETCD_NAME: a3ViZS1ldGNk
 kind: Secret
 metadata:
   name: mysecret
 type: Opaque
-data:
-  ETCD_NAME: a3ViZS1ldGNk
 
 $ cat <<EOF | k8shhh encode
 ETCD_NAME=kube-etcd
@@ -65,10 +65,6 @@ ETCD_LISTEN_PEER_URLS=http://10.0.0.1:2380
 ETCD_LISTEN_CLIENT_URLS=http://10.0.0.1:2379
 EOF
 apiVersion: v1
-kind: Secret
-metadata:
-  name: mysecret
-type: Opaque
 data:
   ETCD_ELECTION_TIMEOUT: NTAw
   ETCD_HEARTBEAT_INTERVAL: MTAw
@@ -76,6 +72,10 @@ data:
   ETCD_LISTEN_PEER_URLS: aHR0cDovLzEwLjAuMC4xOjIzODA=
   ETCD_NAME: a3ViZS1ldGNk
   ETCD_SNAPSHOT_COUNT: NTAwMA==
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
 ```
 
 The result can then be outputted into a `.yaml` or `.json` file, like the
@@ -94,10 +94,6 @@ example.yaml
 
 $ cat example.yaml
 apiVersion: v1
-kind: Secret
-metadata:
-  name: example
-type: Opaque
 data:
   ETCD_ELECTION_TIMEOUT: NTAw
   ETCD_HEARTBEAT_INTERVAL: MTAw
@@ -105,6 +101,10 @@ data:
   ETCD_LISTEN_PEER_URLS: aHR0cDovLzEwLjAuMC4xOjIzODA=
   ETCD_NAME: a3ViZS1ldGNk
   ETCD_SNAPSHOT_COUNT: NTAwMA==
+kind: Secret
+metadata:
+  name: example
+type: Opaque
 ```
 
 ```bash
@@ -149,13 +149,13 @@ DB_PORT=5432
 
 $ k8shhh encode -i example-file
 apiVersion: v1
+data:
+  DB_HOST: bG9jYWxob3N0
+  DB_PORT: NTQzMg==
 kind: Secret
 metadata:
   name: mysecret
 type: Opaque
-data:
-  DB_HOST: bG9jYWxob3N0
-  DB_PORT: NTQzMg==
 ```
 
 Similarly, the result can also be outputted into a proper `.yaml` or `.json` file, as
@@ -167,13 +167,13 @@ example.yaml
 
 $ cat example.yaml
 apiVersion: v1
+data:
+  DB_HOST: bG9jYWxob3N0
+  DB_PORT: NTQzMg==
 kind: Secret
 metadata:
   name: example
 type: Opaque
-data:
-  DB_HOST: bG9jYWxob3N0
-  DB_PORT: NTQzMg==
 ```
 
 ```bash
