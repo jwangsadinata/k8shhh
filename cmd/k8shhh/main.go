@@ -143,7 +143,7 @@ func run() int {
 					return 1
 				}
 
-				fmt.Printf("file %s created", *decOutput)
+				fmt.Printf(`file "%s" created`, *decOutput)
 			} else {
 				fmt.Print(string(output))
 			}
