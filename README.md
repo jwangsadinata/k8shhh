@@ -158,8 +158,8 @@ metadata:
 type: Opaque
 ```
 
-Similarly, the result can also be outputted into a proper `.yaml` or `.json` file, as
-follows:
+Similarly, the result can also be outputted into a proper `.yaml` or
+`.json` file, as follows:
 
 ```bash
 $ k8shhh encode -i example-file -o example
@@ -197,8 +197,8 @@ $ cat example.json
 
 #### Using kubectl with `k8shhh encode`
 
-`k8shhh` works well with [kubectl][kubectl], which is the command line client
-for kubernetes. Some of the examples include the following:
+`k8shhh encode` works well with [kubectl][kubectl], which is the command line
+client for kubernetes. Some of the examples include the following:
 
 ```bash
 $ kubectl create -f $(echo "TOKEN=8fd41973acac04e5fc76fde5439c8b94f1eb1233" | k8shhh encode -o token)
@@ -217,7 +217,8 @@ Data
 TOKEN:  40 bytes
 ```
 
-The most common use case will be to encode directly from a relatively long `.env` file, and pass it as kubernetes secrets, as follows:
+The most common use case will be to encode directly from a relatively long
+`.env` file, and pass it as kubernetes secrets, as follows:
 
 ```bash
 $ ls -a
@@ -310,9 +311,85 @@ CI_REGISTRY_USER:         15 bytes
 
 #### Decode from standard input
 
+```bash
+$ echo "{\"apiVersion\":\"v1\",\"data\":{\"DB_HOST\":\"bG9jYWxob3N0\",\"DB_PORT\":\"NTQzMg==\"},\"kind\":\"Secret\",\"metadata\":{\"name\":\"postgres\"},\"type\":\"Opaque\"}" | k8shhh decode
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+The result can then be easily outputted into a file by using the following
+command:
+
+```bash
+$ echo "{\"apiVersion\":\"v1\",\"data\":{\"DB_HOST\":\"bG9jYWxob3N0\",\"DB_PORT\":\"NTQzMg==\"},\"kind\":\"Secret\",\"metadata\":{\"name\":\"postgres\"},\"type\":\"Opaque\"}" | k8shhh decode -o postgres-env
+file "postgres-env" created
+
+$ cat postgres-env
+DB_HOST=localhost
+DB_PORT=5432
+```
+
 #### Decode directly from file
 
+```bash
+$ ls
+token-secret.yaml
+
+$ cat token-secret.yaml
+apiVersion: v1
+data:
+  TOKEN: OGZkNDE5NzNhY2FjMDRlNWZjNzZmZGU1NDM5YzhiOTRmMWViMTIzMw==
+kind: Secret
+metadata:
+  name: token
+type: Opaque
+
+$ k8shhh decode -i token-secret.yaml
+TOKEN=8fd41973acac04e5fc76fde5439c8b94f1eb1233
+```
+
+The decoded output can also be saved into a file, which can then be used as a
+configuration file for your program.
+
+```bash
+$ k8shhh decode -i token-secret.yaml -o token
+file "token" created
+
+$ cat token
+TOKEN=8fd41973acac04e5fc76fde5439c8b94f1eb1233
+```
+
 #### Using kubectl with `k8shhh decode`
+
+`k8shhh decode` also works well with [kubectl][kubectl]. Some of the examples
+include the following:
+
+```bash
+$ kubectl get secret mysecret -o yaml
+apiVersion: v1
+data:
+  username: YWRtaW4=
+  password: MWYyZDFlMmU2N2Rm
+kind: Secret
+metadata:
+  creationTimestamp: 2016-01-22T18:41:56Z
+  name: mysecret
+  namespace: default
+  resourceVersion: "164619"
+  selfLink: /api/v1/namespaces/default/secrets/mysecret
+  uid: cfee02d6-c137-11e5-8d73-42010af00002
+type: Opaque
+
+$ kubectl get secret mysecret -o yaml | k8shhh decode
+password=1f2d1e2e67df
+username=admin
+
+$ kubectl get secret mysecret -o json | k8shhh decode
+password=1f2d1e2e67df
+username=admin
+```
+
+#### More information
 
 Please see [the GoDoc API page](http://godoc.org/github.com/jwangsadinata/k8shhh) for a
 full API listing. For more examples, please consult `examples` directory located in each subpackages.
@@ -332,7 +409,25 @@ $ git clone git@github.com:jwangsadinata/k8shhh.git
 $ cd k8shhh/
 $ go build -mod=vendor ./cmd/k8shhh
 $ ./k8shhh
-(help output omitted)
+usage: k8shhh [<flags>] <command> [<args> ...]
+
+k8shhh: Quickly encode your configuration into K8s secrets.
+
+Flags:
+  --help  Show context-sensitive help (also try --help-long and --help-man).
+
+Commands:
+  help [<command>...]
+    Show help.
+
+  encode [<flags>]
+    encode your configuration as k8s secrets
+
+  decode [<flags>]
+    decode your k8s secrets into a readable format
+
+  version
+    print the current version of k8shhh.
 ```
 
 This project uses [go modules][go-modules] for managing dependencies, which
