@@ -169,5 +169,5 @@ Flags:
 ### Questions
 
 If you have any questions or issues with these examples, please use the
-[issue tracker][issue-tracker] to report your concerns. Contributions are very
-much welcomed.
+[issue tracker](https://github.com/jwangsadinata/k8shhh/issues) to report
+your concerns. Contributions are very much welcomed.
