@@ -1,3 +1,9 @@
+[![GoDoc][card-godoc]][link-godoc]
+[![Build Status][card-travis]][link-travis]
+[![Go Report Card][card-goreport]][link-goreport]
+[![Coverage Status][card-coverage]][link-coverage]
+[![License: MIT][card-license]][link-license]
+
 # k8shhh
 
 <img src="https://i.imgur.com/OQN6tuT.png" width="400">
@@ -440,9 +446,19 @@ $ GO111MODULE=on go mod tidy
 $ GO111MODULE=on go mod vendor
 ```
 
+[card-coverage]: https://coveralls.io/repos/github/jwangsadinata/k8shhh/badge.svg?branch=master
+[card-godoc]: https://godoc.org/github.com/jwangsadinata/k8shhh?status.svg
+[card-goreport]: https://goreportcard.com/badge/github.com/jwangsadinata/k8shhh
+[card-license]: https://img.shields.io/badge/License-MIT-yellow.svg
+[card-travis]: https://travis-ci.org/jwangsadinata/k8shhh.svg?branch=master
 [go-modules]: https://github.com/golang/go/wiki/Modules
 [go-project]: https://golang.org/project
 [issue-tracker]: https://github.com/jwangsadinata/k8shhh/issues
 [kubectl]: https://kubernetes.io/docs/reference/kubectl/kubectl
+[link-coverage]: https://coveralls.io/github/jwangsadinata/k8shhh?branch=master
+[link-godoc]: https://godoc.org/github.com/jwangsadinata/k8shhh
+[link-goreport]: https://goreportcard.com/report/github.com/jwangsadinata/k8shhh
+[link-license]: https://github.com/jwangsadinata/k8shhh/blob/master/LICENSE
+[link-travis]: https://travis-ci.org/jwangsadinata/k8shhh
 [releases]: https://github.com/jwangsadinata/k8shhh/releases
 [usage]: https://github.com/jwangsadinata/k8shhh#usage
