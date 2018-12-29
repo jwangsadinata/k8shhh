@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	VERSION = "0.0.1"
+	// VERSION is the k8shhh app version
+	VERSION = "1.0.0"
 )
 
 var (
