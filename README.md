@@ -1,5 +1,7 @@
 # k8shhh
 
+<img src="https://i.imgur.com/OQN6tuT.png" width="400">
+
 Quickly encode your configuration into K8s secrets.
 
 ### Contents
