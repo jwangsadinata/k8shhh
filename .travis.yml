@@ -1,0 +1,9 @@
+language: go
+go:
+  - 1.11.x
+  - tip
+env:
+  - GO111MODULE=on
+script:
+  - go build -mod=vendor ./cmd/k8shhh
+  - go test -v -cover ./...
