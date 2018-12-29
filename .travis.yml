@@ -4,6 +4,9 @@ go:
   - tip
 env:
   - GO111MODULE=on
+install:
+  - go get github.com/mattn/goveralls
 script:
   - go build -mod=vendor ./cmd/k8shhh
-  - go test -v -cover ./...
+  - go test -v -coverprofile=coverage.out ./...
+  - goveralls -service=travis-ci -coverprofile=coverage.out
