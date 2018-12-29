@@ -3,7 +3,6 @@ package k8shhh
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -30,7 +29,7 @@ func Decode(input io.Reader, decoder Decoder) ([]byte, error) {
 	case map[string]interface{}:
 		secret = res
 	default:
-		return []byte{}, errors.New(fmt.Sprintf("unexpected type: %T", res))
+		return []byte{}, fmt.Errorf("unexpected type: %T", res)
 	}
 
 	d := secret["data"]
@@ -46,7 +45,7 @@ func Decode(input io.Reader, decoder Decoder) ([]byte, error) {
 	case map[string]interface{}:
 		data = d
 	default:
-		return []byte{}, errors.New(fmt.Sprintf("unexpected type: %T", d))
+		return []byte{}, fmt.Errorf("unexpected type: %T", d)
 	}
 
 	processed := convertValuesToStrings(data)
