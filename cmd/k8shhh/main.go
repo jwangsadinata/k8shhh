@@ -55,58 +55,26 @@ func run() int {
 			return 1
 		}
 
-		var input io.Reader
-		input = os.Stdin
-		if *encInput != "" {
-			f, err := os.Open(*encInput)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "reading input file: %s", err)
-				return 1
-			}
-			defer f.Close()
-			input = f
+		input, err := selectInput(*encInput)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "reading input file: %s", err)
+			return 1
 		}
 
-		var encoder Encoder
-		switch *encFormat {
-		case "json":
-			encoder = EncodeJson
-		case "yaml":
-			encoder = EncodeYaml
-		}
-
-		var secretName string
-		if *encSecretName == "" {
-			if *encOutput == "" {
-				secretName = "mysecret"
-			} else {
-				secretName = trimExtension(*encOutput)
-			}
-		} else {
-			secretName = *encSecretName
-		}
-
-		if output, err := Encode(input, encoder, secretName); err != nil {
+		encoder := selectEncoder(*encFormat)
+		secretName := initializeSecretName(*encSecretName, *encOutput)
+		output, err := Encode(input, encoder, secretName)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "error in encoding: %v\n", err)
 			return 1
-		} else {
-			if *encOutput != "" {
-				filename := *encOutput
-				if !checkExtension(*encOutput) {
-					filename = fmt.Sprintf("%s.%s", *encOutput, *encFormat)
-				}
-				err := ioutil.WriteFile(filename, output, 0644)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
-					return 1
-				}
-
-				// print the file name out - useful for pipe with `kubectl create -f`
-				fmt.Print(filename)
-			} else {
-				fmt.Print(string(output))
-			}
 		}
+
+		msg, err := processEncodeOutput(output, *encOutput, *encFormat)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
+			return 1
+		}
+		fmt.Print(msg)
 	case dec.FullCommand():
 		if isInteractive() && *decInput == "" {
 			kingpin.CommandLine.UsageForContext(ctx)
@@ -114,41 +82,25 @@ func run() int {
 			return 1
 		}
 
-		var input io.Reader
-		input = os.Stdin
-		if *decInput != "" {
-			f, err := os.Open(*decInput)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "reading input file: %s", err)
-				return 1
-			}
-			defer f.Close()
-			input = f
+		input, err := selectInput(*decInput)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "reading input file: %s", err)
+			return 1
 		}
 
-		var decoder Decoder
-		if *decInput != "" && strings.Contains(*decInput, ".json") {
-			decoder = DecodeJson
-		} else {
-			decoder = DecodeYaml
-		}
-
-		if output, err := Decode(input, decoder); err != nil {
+		decoder := selectDecoder(*decInput)
+		output, err := Decode(input, decoder)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "error in decoding: %v\n", err)
 			return 1
-		} else {
-			if *decOutput != "" {
-				err := ioutil.WriteFile(*decOutput, output, 0644)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
-					return 1
-				}
-
-				fmt.Printf(`file "%s" created`, *decOutput)
-			} else {
-				fmt.Print(string(output))
-			}
 		}
+
+		msg, err := processDecodeOutput(output, *decOutput)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "writing to output file: %s", err)
+			return 1
+		}
+		fmt.Print(msg)
 	case version.FullCommand():
 		fmt.Printf("k8shhh %s\n", VERSION)
 	}
@@ -160,6 +112,82 @@ func run() int {
 // extension
 func checkExtension(output string) bool {
 	return strings.HasSuffix(output, ".yaml") || strings.HasSuffix(output, ".json")
+}
+
+// checkFormat checks whether the format passed is correct
+func checkFormat(format string) int {
+	return 0
+}
+
+// initializeSecretName initializes the secret name
+func initializeSecretName(sn, output string) string {
+	if sn == "" {
+		if output == "" {
+			return "mysecret"
+		}
+		return trimExtension(*encOutput)
+	}
+	return sn
+}
+
+// processDecodeOutput process the output of the decoder
+func processDecodeOutput(output []byte, file string) (string, error) {
+	if file != "" {
+		err := ioutil.WriteFile(file, output, 0644)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf(`file "%s" created`, *decOutput), nil
+	}
+	return string(output), nil
+}
+
+// processEncodeOutput process the output of the encoder
+func processEncodeOutput(output []byte, file, format string) (string, error) {
+	if file != "" {
+		filename := file
+		if !checkExtension(file) {
+			filename = fmt.Sprintf("%s.%s", file, format)
+		}
+		err := ioutil.WriteFile(filename, output, 0644)
+		if err != nil {
+			return "", err
+		}
+		// print the file name out - useful for pipe with `kubectl create -f`
+		return filename, nil
+	}
+	return string(output), nil
+}
+
+// selectDecoder returns an encoder based on the input provided.
+func selectDecoder(input string) Decoder {
+	if input != "" && strings.Contains(input, ".json") {
+		return DecodeJson
+	}
+	return DecodeYaml
+}
+
+// selectEncoder returns an encoder based on the format provided.
+func selectEncoder(format string) Encoder {
+	if format == "json" {
+		return EncodeJson
+	}
+	return EncodeYaml
+}
+
+// selectInput returns the io.Reader based on the provided input.
+func selectInput(s string) (io.Reader, error) {
+	var input io.Reader
+	input = os.Stdin
+	if s != "" {
+		f, err := os.Open(s)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		input = f
+	}
+	return input, nil
 }
 
 // trimExtension trims the output string if it contains a .json or .yaml
@@ -177,7 +205,7 @@ func isInteractive() bool {
 	if err != nil {
 		return false
 	}
-	return fileInfo.Mode()&(os.ModeCharDevice|os.ModeCharDevice) != 0
+	return fileInfo.Mode()&os.ModeCharDevice != 0
 }
 
 // main executes the run function
