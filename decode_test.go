@@ -20,55 +20,55 @@ func TestDecode(t *testing.T) {
 	}{
 		{
 			input:   strings.NewReader("-1"),
-			decoder: DecodeYaml,
+			decoder: DecodeYAML,
 			name:    "error-test",
 			err:     errors.New("unexpected type: int"),
 		},
 		{
 			input:   strings.NewReader("data: -1"),
-			decoder: DecodeYaml,
+			decoder: DecodeYAML,
 			name:    "error-test2",
 			err:     errors.New("unexpected type: int"),
 		},
 		{
 			input:   strings.NewReader("value: -"),
-			decoder: DecodeYaml,
+			decoder: DecodeYAML,
 			name:    "error-test3",
 			err:     errors.New("yaml: block sequence entries are not allowed in this context"),
 		},
 		{
-			input:   strings.NewReader(errorDecodeYamlTest),
-			decoder: DecodeYaml,
+			input:   strings.NewReader(errorDecodeYAMLTest),
+			decoder: DecodeYAML,
 			name:    "error-test4",
 			err:     errors.New("illegal base64 data at input byte 0"),
 		},
 		{
-			input:   strings.NewReader(successDecodeJsonTestEmpty),
-			decoder: DecodeJson,
+			input:   strings.NewReader(successDecodeJSONTestEmpty),
+			decoder: DecodeJSON,
 			name:    "json-empty",
 			res:     "",
 		},
 		{
-			input:   strings.NewReader(successDecodeYamlTestEmpty),
-			decoder: DecodeYaml,
+			input:   strings.NewReader(successDecodeYAMLTestEmpty),
+			decoder: DecodeYAML,
 			name:    "yaml-empty",
 			res:     "",
 		},
 		{
-			input:   strings.NewReader(successDecodeYamlTestEmpty2),
-			decoder: DecodeYaml,
+			input:   strings.NewReader(successDecodeYAMLTestEmpty2),
+			decoder: DecodeYAML,
 			name:    "yaml-empty2",
 			res:     "",
 		},
 		{
-			input:   strings.NewReader(successDecodeJsonTestOne),
-			decoder: DecodeJson,
+			input:   strings.NewReader(successDecodeJSONTestOne),
+			decoder: DecodeJSON,
 			name:    "json-one",
 			res:     "a=b",
 		},
 		{
-			input:   strings.NewReader(successDecodeYamlTestOne),
-			decoder: DecodeYaml,
+			input:   strings.NewReader(successDecodeYAMLTestOne),
+			decoder: DecodeYAML,
 			name:    "yaml-one",
 			res:     "a=b",
 		},
@@ -94,8 +94,8 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-// TestDecodeJson tests the DecodeJson function
-func TestDecodeJson(t *testing.T) {
+// TestDecodeJSON tests the DecodeJSON function
+func TestDecodeJSON(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		input io.Reader
@@ -118,7 +118,7 @@ func TestDecodeJson(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			res, err := DecodeJson(test.input)
+			res, err := DecodeJSON(test.input)
 			if err == nil {
 				if test.err != nil {
 					t.Fatalf("expected error to be %q but got %q", test.err, err)
@@ -135,8 +135,8 @@ func TestDecodeJson(t *testing.T) {
 	}
 }
 
-// TestDecodeYaml tests the DecodeYaml function
-func TestDecodeYaml(t *testing.T) {
+// TestDecodeYAML tests the DecodeYAML function
+func TestDecodeYAML(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		input io.Reader
@@ -159,7 +159,7 @@ func TestDecodeYaml(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			_, err := DecodeYaml(test.input)
+			_, err := DecodeYAML(test.input)
 			if err == nil {
 				if test.err != nil {
 					t.Fatalf("expected error to be %q but got %q", test.err, err)
@@ -177,7 +177,7 @@ func TestDecodeYaml(t *testing.T) {
 }
 
 const (
-	errorDecodeYamlTest = `apiVersion: v1
+	errorDecodeYAMLTest = `apiVersion: v1
 kind: Secret
 metadata:
   name: error-test4
@@ -186,7 +186,7 @@ data:
   a: 世界
 `
 
-	successDecodeJsonTestEmpty = `{
+	successDecodeJSONTestEmpty = `{
 	"apiVersion": "v1",
 	"data": {},
 	"kind": "Secret",
@@ -196,7 +196,7 @@ data:
 	"type": "Opaque"
 }`
 
-	successDecodeJsonTestOne = `{
+	successDecodeJSONTestOne = `{
 	"apiVersion": "v1",
 	"data": {
 		"a": "Yg=="
@@ -208,7 +208,7 @@ data:
 	"type": "Opaque"
 }`
 
-	successDecodeYamlTestEmpty = `apiVersion: v1
+	successDecodeYAMLTestEmpty = `apiVersion: v1
 kind: Secret
 metadata:
   name: yaml-empty
@@ -216,7 +216,7 @@ type: Opaque
 data:
 `
 
-	successDecodeYamlTestEmpty2 = `apiVersion: v1
+	successDecodeYAMLTestEmpty2 = `apiVersion: v1
 kind: Secret
 metadata:
   name: yaml-empty2
@@ -224,7 +224,7 @@ type: Opaque
 data: {}
 `
 
-	successDecodeYamlTestOne = `apiVersion: v1
+	successDecodeYAMLTestOne = `apiVersion: v1
 kind: Secret
 metadata:
   name: yaml-one

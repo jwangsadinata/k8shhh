@@ -162,17 +162,17 @@ func processEncodeOutput(output []byte, file, format string) (string, error) {
 // selectDecoder returns an encoder based on the input provided.
 func selectDecoder(input string) Decoder {
 	if input != "" && strings.Contains(input, ".json") {
-		return DecodeJson
+		return DecodeJSON
 	}
-	return DecodeYaml
+	return DecodeYAML
 }
 
 // selectEncoder returns an encoder based on the format provided.
 func selectEncoder(format string) Encoder {
 	if format == "json" {
-		return EncodeJson
+		return EncodeJSON
 	}
-	return EncodeYaml
+	return EncodeYAML
 }
 
 // selectInput returns the io.Reader based on the provided input.

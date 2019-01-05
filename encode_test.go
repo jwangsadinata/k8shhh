@@ -19,33 +19,33 @@ func TestEncode(t *testing.T) {
 	}{
 		{
 			input:   strings.NewReader("-1"),
-			encoder: EncodeYaml,
+			encoder: EncodeYAML,
 			name:    "error-test",
 			err:     errors.New("Can't separate key from value"),
 		},
 		{
 			input:   strings.NewReader(""),
-			encoder: EncodeJson,
+			encoder: EncodeJSON,
 			name:    "json-empty",
-			res:     successEncodeJsonTestEmpty,
+			res:     successEncodeJSONTestEmpty,
 		},
 		{
 			input:   strings.NewReader(""),
-			encoder: EncodeYaml,
+			encoder: EncodeYAML,
 			name:    "yaml-empty",
-			res:     successEncodeYamlTestEmpty,
+			res:     successEncodeYAMLTestEmpty,
 		},
 		{
 			input:   strings.NewReader("a=b"),
-			encoder: EncodeJson,
+			encoder: EncodeJSON,
 			name:    "json-one",
-			res:     successEncodeJsonTestOne,
+			res:     successEncodeJSONTestOne,
 		},
 		{
 			input:   strings.NewReader("a=b"),
-			encoder: EncodeYaml,
+			encoder: EncodeYAML,
 			name:    "yaml-one",
-			res:     successEncodeYamlTestOne,
+			res:     successEncodeYAMLTestOne,
 		},
 	}
 
@@ -69,8 +69,8 @@ func TestEncode(t *testing.T) {
 	}
 }
 
-// TestEncodeJson tests the EncodeJson function
-func TestEncodeJson(t *testing.T) {
+// TestEncodeJSON tests the EncodeJSON function
+func TestEncodeJSON(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		secret Secret
@@ -79,18 +79,18 @@ func TestEncodeJson(t *testing.T) {
 	}{
 		{
 			secret: Secret{"json-empty", make(map[string]string)},
-			res:    successEncodeJsonTestEmpty,
+			res:    successEncodeJSONTestEmpty,
 		},
 		{
 			secret: Secret{"json-one", map[string]string{"a": "b"}},
-			res:    successEncodeJsonTestOne,
+			res:    successEncodeJSONTestOne,
 		},
 	}
 
 	for _, test := range tests {
 		test := test
 		t.Run(test.secret.Name, func(t *testing.T) {
-			res, err := EncodeJson(test.secret)
+			res, err := EncodeJSON(test.secret)
 			if err == nil {
 				if test.err != nil {
 					t.Fatalf("expected error to be %q but got %q", test.err, err)
@@ -107,8 +107,8 @@ func TestEncodeJson(t *testing.T) {
 	}
 }
 
-// TestEncodeYaml tests the EncodeYaml function
-func TestEncodeYaml(t *testing.T) {
+// TestEncodeYAML tests the EncodeYAML function
+func TestEncodeYAML(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		secret Secret
@@ -117,18 +117,18 @@ func TestEncodeYaml(t *testing.T) {
 	}{
 		{
 			secret: Secret{"yaml-empty", make(map[string]string)},
-			res:    successEncodeYamlTestEmpty,
+			res:    successEncodeYAMLTestEmpty,
 		},
 		{
 			secret: Secret{"yaml-one", map[string]string{"a": "b"}},
-			res:    successEncodeYamlTestOne,
+			res:    successEncodeYAMLTestOne,
 		},
 	}
 
 	for _, test := range tests {
 		test := test
 		t.Run(test.secret.Name, func(t *testing.T) {
-			res, err := EncodeYaml(test.secret)
+			res, err := EncodeYAML(test.secret)
 			if err == nil {
 				if test.err != nil {
 					t.Fatalf("expected error to be %q but got %q", test.err, err)
@@ -146,7 +146,7 @@ func TestEncodeYaml(t *testing.T) {
 }
 
 const (
-	successEncodeJsonTestEmpty = `{
+	successEncodeJSONTestEmpty = `{
 	"apiVersion": "v1",
 	"data": {},
 	"kind": "Secret",
@@ -156,7 +156,7 @@ const (
 	"type": "Opaque"
 }`
 
-	successEncodeJsonTestOne = `{
+	successEncodeJSONTestOne = `{
 	"apiVersion": "v1",
 	"data": {
 		"a": "Yg=="
@@ -168,7 +168,7 @@ const (
 	"type": "Opaque"
 }`
 
-	successEncodeYamlTestEmpty = `apiVersion: v1
+	successEncodeYAMLTestEmpty = `apiVersion: v1
 data: {}
 kind: Secret
 metadata:
@@ -176,7 +176,7 @@ metadata:
 type: Opaque
 `
 
-	successEncodeYamlTestOne = `apiVersion: v1
+	successEncodeYAMLTestOne = `apiVersion: v1
 data:
   a: Yg==
 kind: Secret

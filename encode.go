@@ -20,7 +20,7 @@ type Encoder func(Secret) ([]byte, error)
 
 // template is the template struct for both json and yaml encoding
 type template struct {
-	ApiVersion string            `json:"apiVersion" yaml:"apiVersion"`
+	APIVersion string            `json:"apiVersion" yaml:"apiVersion"`
 	Data       map[string]string `json:"data" yaml:"data"`
 	Kind       string            `json:"kind" yaml:"kind"`
 	Metadata   map[string]string `json:"metadata" yaml:"metadata"`
@@ -36,20 +36,20 @@ func Encode(input io.Reader, encoder Encoder, name string) ([]byte, error) {
 	return encoder(Secret{name, data})
 }
 
-// EncodeJson encodes the secret and output it to a json format
-func EncodeJson(secret Secret) ([]byte, error) {
+// EncodeJSON encodes the secret and output it to a json format
+func EncodeJSON(secret Secret) ([]byte, error) {
 	return json.MarshalIndent(generateTemplate(secret), "", "\t")
 }
 
-// EncodeYaml encodes the secret and output it to a yaml format
-func EncodeYaml(secret Secret) ([]byte, error) {
+// EncodeYAML encodes the secret and output it to a yaml format
+func EncodeYAML(secret Secret) ([]byte, error) {
 	return yaml.Marshal(generateTemplate(secret))
 }
 
 // generateTemplate puts the Secret name and data to the kubernetes template
 func generateTemplate(secret Secret) template {
 	tmpl := template{
-		ApiVersion: "v1",
+		APIVersion: "v1",
 		Data:       make(map[string]string),
 		Kind:       "Secret",
 		Metadata:   map[string]string{"name": secret.Name},

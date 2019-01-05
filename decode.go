@@ -68,8 +68,8 @@ func Decode(input io.Reader, decoder Decoder) ([]byte, error) {
 	return []byte(out), nil
 }
 
-// DecodeJson decodes the json formatted input into the readable secret
-func DecodeJson(input io.Reader) (interface{}, error) {
+// DecodeJSON decodes the json formatted input into the readable secret
+func DecodeJSON(input io.Reader) (interface{}, error) {
 	var res interface{}
 	if err := json.NewDecoder(input).Decode(&res); err != nil {
 		return nil, err
@@ -77,8 +77,8 @@ func DecodeJson(input io.Reader) (interface{}, error) {
 	return res, nil
 }
 
-// DecodeYaml decodes the yaml formatted input into the readable secret
-func DecodeYaml(input io.Reader) (interface{}, error) {
+// DecodeYAML decodes the yaml formatted input into the readable secret
+func DecodeYAML(input io.Reader) (interface{}, error) {
 	var res interface{}
 	if err := yaml.NewDecoder(input).Decode(&res); err != nil {
 		return nil, err
