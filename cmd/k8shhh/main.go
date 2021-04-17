@@ -60,6 +60,7 @@ func run() int {
 			fmt.Fprintf(os.Stderr, "reading input file: %s", err)
 			return 1
 		}
+		defer input.Close()
 
 		encoder := selectEncoder(*encFormat)
 		secretName := initializeSecretName(*encSecretName, *encOutput)
@@ -176,15 +177,14 @@ func selectEncoder(format string) Encoder {
 }
 
 // selectInput returns the io.Reader based on the provided input.
-func selectInput(s string) (io.Reader, error) {
-	var input io.Reader
+func selectInput(s string) (io.ReadCloser, error) {
+	var input io.ReadCloser
 	input = os.Stdin
 	if s != "" {
 		f, err := os.Open(s)
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
 		input = f
 	}
 	return input, nil
